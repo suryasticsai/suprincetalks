@@ -3,7 +3,7 @@
 
 > *"Reflections from the trenches, one sprint at a time."*
 
-![SuprinceTalks Banner](https://raw.githubusercontent.com/suryasticsai/suprincetalks/main/images/suprince-banner.png)
+![SuprinceTalks Banner](https://raw.githubusercontent.com/suryasticsai/suprincetalks/main/images/suprince-tcs.png)
 
 ---
 
@@ -154,4 +154,4 @@ This journal is meant to inspire, not to instruct. You’re welcome to reference
 **Let’s keep learning, one sprint at a time.** ⚡  
 *— Sai Surya | SAFe Scrum Master*
 
-![SuprinceTalks Footer](https://raw.githubusercontent.com/suryasticsai/suprincetalks/main/images/footer.png)
+![SuprinceTalks Footer](https://raw.githubusercontent.com/suryasticsai/suprincetalks/main/images/suprince.png)
