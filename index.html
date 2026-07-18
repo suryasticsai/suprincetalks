@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SuprinceTalks — PI Planning Complete! We Are Ready to Sprint!</title>
+<style>
+  :root{
+    --bg:#f7f5ef;
+    --bg-soft:#efe9d8;
+    --card:#ffffff;
+    --ink:#1b2430;
+    --sub-ink:#4a5364;
+    --tcs-blue:#003c72;
+    --tcs-blue-deep:#00294d;
+    --gold:#c99a3b;
+    --gold2:#e7c477;
+    --line:#e3ddcd;
+    --shadow:rgba(0,20,50,0.08);
+    --grass:#2f9e5b;
+    color-scheme:light;
+  }
+  [data-theme="night"]{
+    --bg:#0a0f1c;
+    --bg-soft:#101a2e;
+    --card:#121c33;
+    --ink:#eef2fb;
+    --sub-ink:#a9b4cc;
+    --tcs-blue:#6aa6ff;
+    --tcs-blue-deep:#dfe9ff;
+    --gold:#f2c14e;
+    --gold2:#ffd97a;
+    --line:#233054;
+    --shadow:rgba(0,0,0,0.55);
+    color-scheme:dark;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0; background:var(--bg); color:var(--ink);
+    font-family:'Segoe UI','Helvetica Neue',Arial,sans-serif; line-height:1.6;
+    transition:background .5s ease,color .5s ease;
+    overflow-x:hidden;
+  }
+  a{color:inherit;}
+  img.swayable{ cursor:pointer; transform-origin:top center; }
+  img.swayable.swaying{ animation:sway 2.2s ease-in-out; }
+  @keyframes sway{
+    0%,100%{ transform:rotate(0deg); }
+    20%{ transform:rotate(5deg); }
+    45%{ transform:rotate(-4deg); }
+    70%{ transform:rotate(3deg); }
+    90%{ transform:rotate(-1.5deg); }
+  }
+
+  /* ===== Header ===== */
+  .header{
+    background:linear-gradient(135deg,var(--tcs-blue-deep) 0%, var(--tcs-blue) 100%);
+    color:#fff; padding:20px 36px; display:flex; align-items:center; justify-content:space-between;
+    gap:20px; flex-wrap:wrap; position:sticky; top:0; z-index:20; box-shadow:0 2px 14px var(--shadow);
+    transition:background .5s ease;
+  }
+  [data-theme="night"] .header{ background:linear-gradient(135deg,#050810 0%, #0d1a33 100%); }
+  .brandmark{ display:flex; align-items:center; gap:12px; }
+  .brandmark img{ height:42px; border-radius:8px; background:#fff; padding:4px; }
+  .brand-text .name{ font-weight:800; font-size:17px; letter-spacing:.02em; }
+  .brand-text .tagline{ font-size:11.5px; opacity:.85; letter-spacing:.08em; text-transform:uppercase; }
+  .header-right{ display:flex; align-items:center; gap:16px; }
+  .pi-tag{ font-size:12.5px; background:rgba(255,255,255,.12); border:1px solid rgba(255,255,255,.32); padding:6px 14px; border-radius:999px; }
+  .theme-toggle{ display:flex; align-items:center; gap:8px; background:rgba(255,255,255,.12); border:1px solid rgba(255,255,255,.3); border-radius:999px; padding:5px; cursor:pointer; user-select:none; }
+  .theme-toggle .track{ width:42px; height:22px; border-radius:999px; background:rgba(0,0,0,.25); position:relative; }
+  .theme-toggle .knob{ position:absolute; top:2px; left:2px; width:18px; height:18px; border-radius:50%; background:var(--gold); transition:left .35s cubic-bezier(.5,1.8,.5,1); }
+  [data-theme="night"] .theme-toggle .knob{ left:22px; background:#8fb3ff; }
+  .theme-toggle .lbl{ font-size:11px; opacity:.85; }
+
+  /* ===== Name gate ===== */
+  .name-gate{
+    position:fixed; inset:0; z-index:999; display:flex; align-items:center; justify-content:center;
+    background:radial-gradient(circle at 50% 20%, rgba(0,60,114,.85), rgba(0,15,35,.94));
+    backdrop-filter:blur(6px);
+    transition:opacity .5s ease, transform .5s ease;
+    padding:20px;
+  }
+  .name-gate.gate-hidden{ opacity:0; transform:scale(.94); pointer-events:none; }
+  .name-gate-panel{
+    background:var(--card); color:var(--ink); border-radius:18px; padding:36px 32px; max-width:380px; width:100%;
+    text-align:center; box-shadow:0 20px 60px rgba(0,0,0,.4); border:1px solid var(--line);
+  }
+  .name-gate-panel img{ height:64px; margin-bottom:10px; }
+  .name-gate-panel h2{ margin:6px 0 4px; font-size:19px; }
+  .name-gate-panel p{ margin:0 0 16px; color:var(--sub-ink); font-size:14px; }
+  .name-gate-panel input{
+    width:100%; padding:12px 14px; border-radius:10px; border:1px solid var(--line); font-size:15px;
+    margin-bottom:14px; background:var(--bg-soft); color:var(--ink); outline:none;
+  }
+  .name-gate-panel input:focus{ border-color:var(--tcs-blue); }
+  .gate-actions{ display:flex; flex-direction:column; gap:8px; }
+  .gate-actions button{ border:none; border-radius:999px; padding:11px 18px; font-size:14px; font-weight:700; cursor:pointer; transition:transform .15s ease; }
+  .gate-actions button:hover{ transform:translateY(-1px); }
+  #nameSubmit{ background:linear-gradient(135deg,var(--tcs-blue),var(--tcs-blue-deep)); color:#fff; }
+  #nameSkip{ background:transparent; color:var(--sub-ink); font-weight:600; }
+
+  /* ===== Hero + clouds ===== */
+  .hero-wrap{ position:relative; overflow:hidden; }
+  .cloud-layer{ position:absolute; inset:0; height:100%; pointer-events:none; z-index:0; }
+  .cloud{
+    position:absolute; border-radius:50%; background:#fff; opacity:.5; filter:blur(1px);
+    box-shadow:30px 6px 0 -4px #fff, -28px 10px 0 -6px #fff, 10px -14px 0 -8px #fff;
+    animation:drift linear infinite;
+  }
+  [data-theme="night"] .cloud{ background:#1c2c4a; box-shadow:30px 6px 0 -4px #1c2c4a, -28px 10px 0 -6px #1c2c4a, 10px -14px 0 -8px #1c2c4a; opacity:.55; }
+  @keyframes drift{ from{ transform:translateX(-20vw); } to{ transform:translateX(120vw); } }
+  .star{ position:absolute; width:3px; height:3px; background:#cfe0ff; border-radius:50%; opacity:0; animation:twinkle 3.5s ease-in-out infinite; display:none; }
+  [data-theme="night"] .star{ display:block; }
+  @keyframes twinkle{ 0%,100%{ opacity:0; } 50%{ opacity:.9; } }
+
+  .hero{ position:relative; z-index:1; max-width:900px; margin:0 auto; padding:64px 24px 16px; text-align:center; }
+  .hero .eyebrow{ color:var(--gold); font-weight:700; letter-spacing:.14em; text-transform:uppercase; font-size:13px; margin-bottom:14px; transition:color .3s ease; }
+  .hero h1{ font-size:clamp(30px,4.5vw,48px); margin:0 0 14px; color:var(--tcs-blue-deep); line-height:1.15; }
+  [data-theme="night"] .hero h1{ color:#fff; }
+  .hero p.lede{ font-size:18px; color:var(--sub-ink); max-width:660px; margin:0 auto; }
+  .hero .personal-note{ margin-top:14px; font-size:14px; color:var(--tcs-blue); font-weight:600; display:none; }
+  .hero .personal-note.show{ display:block; }
+
+  .container{ max-width:900px; margin:0 auto; padding:20px 24px 40px; position:relative; z-index:1; }
+  .card{ background:var(--card); border:1px solid var(--line); border-radius:14px; padding:32px 34px; margin-bottom:26px; box-shadow:0 1px 4px var(--shadow); transition:background .5s ease,border-color .5s ease; }
+  .card h2{ color:var(--tcs-blue); font-size:22px; margin:0 0 16px; display:flex; align-items:center; gap:10px; transition:color .3s ease; }
+  [data-theme="night"] .card h2{ color:#8fb3ff; }
+  .card p{ color:var(--sub-ink); margin:0 0 14px; }
+  .card p:last-child{ margin-bottom:0; }
+
+  .about-grid{ display:grid; grid-template-columns:1.1fr .9fr; gap:28px; align-items:center; }
+  @media (max-width:680px){ .about-grid{ grid-template-columns:1fr; } }
+  .about-grid img{ width:100%; border-radius:12px; box-shadow:0 4px 16px var(--shadow); }
+  .quote-chip{ display:inline-block; margin-top:10px; font-size:13px; font-style:italic; background:var(--bg-soft); border-left:3px solid var(--gold); padding:8px 14px; border-radius:6px; color:var(--sub-ink); }
+
+  .journey{ display:grid; grid-template-columns:repeat(3,1fr); gap:16px; }
+  @media (max-width:640px){ .journey{ grid-template-columns:1fr; } }
+  .day{ background:var(--bg-soft); border:1px solid var(--line); border-radius:10px; padding:18px; }
+  .day .day-label{ font-weight:700; color:var(--gold); font-size:13px; text-transform:uppercase; letter-spacing:.06em; margin-bottom:6px; }
+  .day p{ font-size:14px; margin:0; color:var(--sub-ink); }
+
+  .pokemon-banner{ background:linear-gradient(135deg,#2d6cdf 0%, var(--grass) 100%); color:#fff; text-align:center; padding:36px 30px; position:relative; overflow:hidden; }
+  .pokemon-banner h2{ color:#fff; position:relative; justify-content:center; }
+  .pokemon-banner p{ color:rgba(255,255,255,.92); position:relative; max-width:560px; margin:0 auto 10px; }
+  .poke-badge{ display:inline-flex; align-items:center; gap:8px; background:var(--gold2); color:#3a2a00; font-weight:700; padding:8px 18px; border-radius:999px; margin-top:6px; font-size:14px; position:relative; }
+  .banner-link{ display:inline-block; margin-top:14px; font-size:13.5px; color:#fff; text-decoration:underline; position:relative; }
+
+  /* ===== Team grid / flip cards ===== */
+  .team-intro{ text-align:center; max-width:600px; margin:0 auto 26px; }
+  .team-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(210px,1fr)); gap:22px; }
+  .flip-wrap{ text-align:center; position:relative; }
+  .medal-ribbon{ position:absolute; top:-10px; right:6px; font-size:22px; z-index:3; filter:drop-shadow(0 2px 3px rgba(0,0,0,.3)); }
+  .you-ribbon{ position:absolute; top:-10px; left:6px; font-size:11px; background:var(--gold); color:#3a2a00; font-weight:800; padding:3px 8px; border-radius:999px; z-index:3; }
+  .poke-card{ perspective:1400px; width:100%; max-width:280px; margin:0 auto; aspect-ratio:3/4; cursor:pointer; }
+  .poke-card.is-you .poke-card-inner{ animation:glowPulse 2.2s ease-in-out infinite; }
+  @keyframes glowPulse{ 0%,100%{ filter:drop-shadow(0 0 0px var(--gold)); } 50%{ filter:drop-shadow(0 0 14px var(--gold)); } }
+  .poke-card-inner{ position:relative; width:100%; height:100%; transition:transform 1.1s cubic-bezier(.4,.2,.2,1); transform-style:preserve-3d; }
+  .poke-card.flipped .poke-card-inner{ transform:rotateY(180deg); }
+  .poke-card-face{ position:absolute; inset:0; backface-visibility:hidden; border-radius:14px; overflow:hidden; box-shadow:0 10px 26px var(--shadow); border:3px solid var(--card-accent, var(--gold)); }
+  .poke-card-front{ position:relative; }
+  .poke-card-front .front-img{ width:100%; height:100%; object-fit:cover; display:block; filter:brightness(.55) saturate(1.1); }
+  .poke-card-front .front-overlay{
+    position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:flex-end;
+    padding:14px; background:linear-gradient(180deg, transparent 30%, rgba(0,0,0,.75) 100%);
+  }
+  .front-overlay .poke-thumb{ width:56px; height:56px; object-fit:contain; margin-bottom:8px; filter:drop-shadow(0 3px 6px rgba(0,0,0,.5)); display:none; }
+  .front-overlay .poke-emoji{ font-size:34px; margin-bottom:6px; }
+  .front-overlay .p-name{ color:#fff; font-weight:800; font-size:16px; }
+  .front-overlay .p-type{ color:#fff; font-size:11px; letter-spacing:.06em; text-transform:uppercase; background:var(--card-accent, var(--gold)); padding:2px 10px; border-radius:999px; margin-top:4px; }
+  .poke-card-back{
+    transform:rotateY(180deg); background:linear-gradient(160deg,var(--card-accent,#003c72),var(--card-accent2,#00294d));
+    color:#fff; display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center; padding:20px; gap:8px;
+  }
+  .poke-card-back .trainer-title{ font-weight:800; font-size:14px; letter-spacing:.03em; }
+  .poke-card-back p{ font-size:12.5px; margin:0; color:rgba(255,255,255,.95); }
+  .flip-hint{ margin-top:10px; font-size:12px; color:var(--sub-ink); letter-spacing:.03em; }
+  .flip-hint::before{ content:"⟳ "; }
+
+  .stats{ display:grid; grid-template-columns:repeat(2,1fr); gap:10px; margin-top:6px; }
+  @media (max-width:520px){ .stats{ grid-template-columns:1fr; } }
+  .stats div{ background:var(--bg-soft); border-radius:8px; padding:12px 14px; font-size:14px; color:var(--tcs-blue-deep); display:flex; align-items:center; gap:8px; }
+  [data-theme="night"] .stats div{ color:#dfe9ff; }
+  .stats div::before{ content:"✓"; color:var(--grass); font-weight:700; }
+
+  .signoff{ text-align:center; padding-top:10px; }
+  .signoff .tag-line{ font-size:22px; font-weight:700; color:var(--tcs-blue-deep); margin-bottom:6px; }
+  [data-theme="night"] .signoff .tag-line{ color:#fff; }
+  .signoff .signature{ margin-top:18px; color:var(--sub-ink); font-size:15px; }
+  .signoff .sig-logo{ height:30px; vertical-align:middle; margin-left:8px; border-radius:6px; }
+
+  .hashtags{ text-align:center; color:var(--tcs-blue); font-size:13px; padding:0 24px 30px; max-width:900px; margin:0 auto; }
+  [data-theme="night"] .hashtags{ color:#8fb3ff; }
+
+  /* ===== Footer ===== */
+  footer{ background:var(--tcs-blue-deep); color:rgba(255,255,255,.85); padding:36px 24px 24px; }
+  [data-theme="night"] footer{ background:#050810; }
+  .footer-brand-strip{ max-width:900px; margin:0 auto 26px; display:flex; align-items:center; justify-content:center; gap:26px; flex-wrap:wrap; background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.12); border-radius:14px; padding:18px; }
+  .footer-brand-strip img{ height:56px; }
+  .footer-inner{ max-width:900px; margin:0 auto; display:grid; grid-template-columns:1.2fr 1fr; gap:30px; }
+  @media (max-width:640px){ .footer-inner{ grid-template-columns:1fr; } }
+  footer h3{ font-size:14px; text-transform:uppercase; letter-spacing:.08em; color:var(--gold); margin:0 0 12px; }
+  .tcs-tag{ font-size:13px; opacity:.85; max-width:320px; }
+  .link-row{ display:flex; flex-wrap:wrap; gap:10px; margin-top:6px; }
+  .link-chip{ display:inline-flex; align-items:center; gap:7px; background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.18); padding:8px 14px; border-radius:999px; font-size:13px; text-decoration:none; color:#fff; transition:background .2s ease, transform .2s ease; }
+  .link-chip:hover{ background:rgba(255,255,255,.18); transform:translateY(-2px); }
+  .link-chip svg{ width:15px; height:15px; fill:currentColor; }
+  .footer-bottom{ max-width:900px; margin:26px auto 0; padding-top:18px; border-top:1px solid rgba(255,255,255,.14); display:flex; justify-content:space-between; flex-wrap:wrap; gap:8px; font-size:12px; opacity:.7; }
+</style>
+</head>
+<body>
+
+  <!-- ===== Name gate ===== -->
+  <div class="name-gate" id="nameGate">
+    <div class="name-gate-panel">
+      <img src="https://raw.githubusercontent.com/suryasticsai/suprincetalks/main/images/suprince-logo.png" alt="SuprinceTalks">
+      <h2>Hey buddy, welcome to SuprinceTalks 👋</h2>
+      <p>What's your name, dear?</p>
+      <input id="nameInput" type="text" placeholder="Type your name...">
+      <div class="gate-actions">
+        <button id="nameSubmit">Enter the Diary →</button>
+        <button id="nameSkip">Just browsing</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="header">
+    <div class="brandmark">
+      <img src="https://raw.githubusercontent.com/suryasticsai/suprincetalks/main/images/suprince-logo.png" alt="SuprinceTalks logo">
+      <div class="brand-text">
+        <div class="name">SuprinceTalks</div>
+        <div class="tagline">A Scrum Master's Daily Tale</div>
+      </div>
+    </div>
+    <div class="header-right">
+      <div class="pi-tag">PI Planning Wrap-Up · Day 3</div>
+      <div class="theme-toggle" id="themeToggle" role="button" aria-label="Toggle day and night mode">
+        <span class="lbl">☀️</span>
+        <div class="track"><div class="knob" id="themeKnob"></div></div>
+        <span class="lbl">🌙</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="hero-wrap">
+    <div class="cloud-layer" id="cloudLayer"></div>
+    <div class="hero">
+      <div class="eyebrow" id="heroEyebrow">🎉 We are officially ready</div>
+      <h1>PI Planning Complete!<br>We Are Ready to Sprint.</h1>
+      <p class="lede">Hello Team — three days of clarity, hard questions, and teamwork later, we're aligned, committed, and ready to begin this new Program Increment with passion and a winning spirit.</p>
+      <div class="personal-note" id="personalNote"></div>
+    </div>
+  </div>
+
+  <div class="container">
+
+    <div class="card">
+      <h2>📓 Behind This Diary</h2>
+      <div class="about-grid">
+        <div>
+          <p><strong>SuprinceTalks</strong> is my daily, AI-logged journey as a SAFe Scrum Master — a running diary of ceremonies, retros, and the small decisions that make a team click, written without giving away anything confidential.</p>
+          <p>Under this brand, I bring my <strong>Techno-Agilist</strong> background — QA, full-stack, and Java engineering roots — into SAFe Scrum Master delivery, currently providing these services in collaboration with TCS as part of Team Surya.</p>
+          <span class="quote-chip">"Building on Belief, Experience Certainty" — TCS</span>
+        </div>
+        <div>
+          <img class="swayable" src="https://raw.githubusercontent.com/suryasticsai/suprincetalks/main/images/suprince-tcs.png" alt="SuprinceTalks collaborating with TCS">
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>🐟 From Uncertainty to Clarity</h2>
+      <p>We started this PI as a new team — with diverse roles across Dev, QA, and DE — and all the natural challenges that come with a fresh start. But through collaboration, we fished for context, mapped dependencies, ROAMed our risks, and scored our PI Objectives. We didn't just get through it — we got aligned.</p>
+    </div>
+
+    <div class="card">
+      <h2>🗺️ The Journey</h2>
+      <div class="journey">
+        <div class="day">
+          <div class="day-label">Day 1</div>
+          <p>Identified risks, acknowledged that being new means needing time to learn, and decided to tackle dependencies head-on by asking the right questions.</p>
+        </div>
+        <div class="day">
+          <div class="day-label">Day 2</div>
+          <p>Participated, asked tough questions, and began to shape our deliverables.</p>
+        </div>
+        <div class="day">
+          <div class="day-label">Day 3</div>
+          <p>Finalized our commitment, drafted business value, resolved dependencies, and cast our confidence vote. We are aligned and ready to execute.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="card pokemon-banner">
+      <h2>🚀 Introducing a Team Tradition: The Pokémon Sprint Card Game!</h2>
+      <p>To bring some fun into our work and make our sprints memorable, we're introducing the Pokémon Sprint Card Game. Each sprint, we'll use the spirit of Pokémon — strategy, evolution, and teamwork — to <em>catch</em> our goals and <em>evolve</em> our skills.</p>
+      <div class="poke-badge">⚡ Gotta catch every sprint goal!</div><br>
+      <a class="banner-link" href="https://suryasticsai.medium.com/the-pok%C3%A9mon-sprint-game-transforming-agile-work-into-an-adventure-1ce93241f759" target="_blank" rel="noopener">📖 Want to know how it works? Read the full story here — or wait for Iteration Day 1!</a>
+    </div>
+
+    <div class="card" id="teamCard" style="display:none;">
+      <h2 id="teamHeading">🎴 Your Card</h2>
+      <div class="team-intro" id="teamIntro">
+        <p>Tap the card below to flip it — there's a personal note waiting just for you.</p>
+      </div>
+      <div class="team-grid" id="teamGrid" style="max-width:280px; margin:0 auto;"></div>
+    </div>
+
+    <div class="card">
+      <h2>📊 The State of the Team</h2>
+      <p>Our feedback polls showed a mix of "totally new" and "not that good" feelings going in — perfectly normal for a new team. But look at what we achieved together:</p>
+      <div class="stats">
+        <div>Resolved our critical dependencies</div>
+        <div>Owned the features assigned to each individual</div>
+        <div>Accepted the capacity and timelines</div>
+        <div>Mitigated risks by asking for context and support</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>➡️ What's Next?</h2>
+      <p>We're now moving into execution. If you have questions, ask them early. If you find a dependency, highlight it immediately. The 8-point capacity is our baseline — if you need a buffer, speak up. Most importantly, take ownership of your features and finish strong.</p>
+    </div>
+
+    <div class="card signoff">
+      <p style="margin-bottom:18px;">Thank you all for your energy, your questions, and your commitment. Let's bring the same passion to our daily work that we brought to this planning. We are a team, and together, we will succeed.</p>
+      <div class="tag-line">Let's get ready to catch 'em all! ⚡</div>
+      <div class="signature">
+        Thanks,<br>
+        <strong>Sai Surya</strong> · Scrum Master
+        <img class="sig-logo swayable" src="https://raw.githubusercontent.com/suryasticsai/suprincetalks/main/images/suprince-logo.png" alt="SuprinceTalks">
+      </div>
+    </div>
+
+  </div>
+
+  <div class="hashtags">
+    #PIPlanning &nbsp;#ScrumMaster &nbsp;#TeamWork &nbsp;#Pokémon &nbsp;#NewBeginnings &nbsp;#TCS &nbsp;#SuprinceTalks &nbsp;#BeliefAndCertainty
+  </div>
+
+  <footer>
+    <div class="footer-brand-strip">
+      <img class="swayable" src="https://raw.githubusercontent.com/suryasticsai/suprincetalks/main/images/suprince-logo.png" alt="SuprinceTalks logo">
+      <img class="swayable" src="https://raw.githubusercontent.com/suryasticsai/suprincetalks/main/images/suprince-tcs.png" alt="SuprinceTalks collaborating with TCS" style="height:56px;">
+    </div>
+    <div class="footer-inner">
+      <div>
+        <h3>About</h3>
+        <p class="tcs-tag">SuprinceTalks — a Scrum Master's daily tale. Techno-Agilist services delivered in collaboration with TCS. "Building on Belief, Experience Certainty."</p>
+      </div>
+      <div>
+        <h3>Follow the Daily Tale</h3>
+        <div class="link-row">
+          <a class="link-chip" href="https://github.com/suryasticsai/suprincetalks" target="_blank" rel="noopener">
+            <svg viewBox="0 0 24 24"><path d="M12 .5C5.73.5.5 5.73.5 12c0 5.09 3.29 9.4 7.86 10.93.57.1.78-.25.78-.55 0-.27-.01-1.17-.02-2.12-3.2.7-3.88-1.36-3.88-1.36-.52-1.33-1.28-1.68-1.28-1.68-1.04-.71.08-.7.08-.7 1.15.08 1.76 1.18 1.76 1.18 1.03 1.75 2.7 1.25 3.36.96.1-.75.4-1.25.73-1.54-2.55-.29-5.24-1.28-5.24-5.7 0-1.26.45-2.29 1.18-3.09-.12-.29-.51-1.46.11-3.05 0 0 .96-.31 3.15 1.18a10.9 10.9 0 0 1 5.74 0c2.19-1.49 3.15-1.18 3.15-1.18.62 1.59.23 2.76.11 3.05.74.8 1.18 1.83 1.18 3.09 0 4.43-2.7 5.41-5.27 5.69.42.36.78 1.08.78 2.17 0 1.57-.01 2.83-.01 3.22 0 .3.2.66.79.55A10.52 10.52 0 0 0 23.5 12C23.5 5.73 18.27.5 12 .5Z"/></svg>
+            GitHub
+          </a>
+          <a class="link-chip" href="https://huggingface.co/Suryasticsai" target="_blank" rel="noopener">🤗 Hugging Face</a>
+          <a class="link-chip" href="https://instagram.com/suprincetalks" target="_blank" rel="noopener">
+            <svg viewBox="0 0 24 24"><path d="M12 2.16c3.2 0 3.58.01 4.85.07 1.17.05 1.8.25 2.23.41.56.22.96.48 1.38.9.42.42.68.82.9 1.38.16.42.36 1.06.41 2.23.06 1.27.07 1.65.07 4.85s-.01 3.58-.07 4.85c-.05 1.17-.25 1.8-.41 2.23-.22.56-.48.96-.9 1.38-.42.42-.82.68-1.38.9-.42.16-1.06.36-2.23.41-1.27.06-1.65.07-4.85.07s-3.58-.01-4.85-.07c-1.17-.05-1.8-.25-2.23-.41a3.72 3.72 0 0 1-1.38-.9 3.72 3.72 0 0 1-.9-1.38c-.16-.42-.36-1.06-.41-2.23-.06-1.27-.07-1.65-.07-4.85s.01-3.58.07-4.85c.05-1.17.25-1.8.41-2.23.22-.56.48-.96.9-1.38.42-.42.82-.68 1.38-.9.42-.16 1.06-.36 2.23-.41 1.27-.06 1.65-.07 4.85-.07M12 0C8.74 0 8.33.01 7.05.07 5.78.13 4.9.33 4.14.63c-.8.31-1.47.72-2.14 1.39A5.9 5.9 0 0 0 .61 4.16c-.3.76-.5 1.64-.56 2.91C0 8.35 0 8.76 0 12s.01 3.65.07 4.93c.06 1.27.26 2.15.56 2.91.31.8.72 1.47 1.39 2.14.67.67 1.34 1.08 2.14 1.39.76.3 1.64.5 2.91.56C8.35 24 8.76 24 12 24s3.65-.01 4.93-.07c1.27-.06 2.15-.26 2.91-.56.8-.31 1.47-.72 2.14-1.39.67-.67 1.08-1.34 1.39-2.14.3-.76.5-1.64.56-2.91.06-1.28.07-1.69.07-4.93s-.01-3.65-.07-4.93c-.06-1.27-.26-2.15-.56-2.91a5.9 5.9 0 0 0-1.39-2.14A5.9 5.9 0 0 0 19.84.63c-.76-.3-1.64-.5-2.91-.56C15.65.01 15.24 0 12 0Zm0 5.84A6.16 6.16 0 1 0 12 18.16 6.16 6.16 0 0 0 12 5.84Zm0 10.16A4 4 0 1 1 12 8a4 4 0 0 1 0 8Zm6.4-10.4a1.44 1.44 0 1 1-2.88 0 1.44 1.44 0 0 1 2.88 0Z"/></svg>
+            Instagram
+          </a>
+          <a class="link-chip" href="https://suryasticsai.medium.com" target="_blank" rel="noopener">✍️ Medium</a>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>Tata Consultancy Services · Team Surya</span>
+      <span>SuprinceTalks — A Scrum Master's Daily Tale</span>
+    </div>
+  </footer>
+
+<script>
+  /* ============ Theme (day/night) ============ */
+  const root = document.documentElement;
+  const toggle = document.getElementById('themeToggle');
+  function applyTheme(t){ root.setAttribute('data-theme', t); }
+  const mq = window.matchMedia('(prefers-color-scheme: dark)');
+  applyTheme(mq.matches ? 'night' : 'day');
+  mq.addEventListener('change', e => applyTheme(e.matches ? 'night' : 'day'));
+
+  let ctx;
+  function getCtx(){ ctx = ctx || new (window.AudioContext || window.webkitAudioContext)(); return ctx; }
+  function tone(freq, t0, dur, type, vol){
+    const c = getCtx(); const o = c.createOscillator(), g = c.createGain();
+    o.type = type || 'sine'; o.frequency.value = freq;
+    g.gain.setValueAtTime(0.0001, t0);
+    g.gain.exponentialRampToValueAtTime(vol || 0.05, t0 + 0.015);
+    g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+    o.connect(g); g.connect(c.destination); o.start(t0); o.stop(t0 + dur + 0.02);
+  }
+  function playToggleBlip(){ const c = getCtx(); tone(520, c.currentTime, 0.12, 'sine', 0.06); }
+  function playFlipSound(){ const c = getCtx(); const now = c.currentTime; [660,880,1046].forEach((f,i)=>tone(f, now + i*0.075, 0.13, 'square', 0.05)); }
+  function playChime(){ const c = getCtx(); const now = c.currentTime; [523,659,784,1046].forEach((f,i)=>tone(f, now + i*0.09, 0.22, 'sine', 0.045)); }
+
+  toggle.addEventListener('click', () => {
+    playToggleBlip();
+    applyTheme(root.getAttribute('data-theme') === 'night' ? 'day' : 'night');
+  });
+
+  /* ============ Sway on click for any .swayable image ============ */
+  document.addEventListener('click', (e) => {
+    const img = e.target.closest('img.swayable');
+    if (!img) return;
+    img.classList.remove('swaying'); void img.offsetWidth;
+    img.classList.add('swaying');
+    img.addEventListener('animationend', () => img.classList.remove('swaying'), { once: true });
+  });
+
+  /* ============ Background clouds / stars ============ */
+  const cloudLayer = document.getElementById('cloudLayer');
+  const cloudSpecs = [
+    {top:'8%',  size:34, dur:38, delay:0},
+    {top:'22%', size:22, dur:52, delay:-14},
+    {top:'40%', size:44, dur:64, delay:-30},
+    {top:'55%', size:26, dur:46, delay:-8},
+    {top:'70%', size:30, dur:58, delay:-22},
+  ];
+  cloudSpecs.forEach(s => {
+    const el = document.createElement('div');
+    el.className = 'cloud';
+    el.style.top = s.top;
+    el.style.width = s.size + 'px';
+    el.style.height = (s.size * 0.6) + 'px';
+    el.style.animationDuration = s.dur + 's';
+    el.style.animationDelay = s.delay + 's';
+    cloudLayer.appendChild(el);
+  });
+  for (let i = 0; i < 18; i++) {
+    const st = document.createElement('div');
+    st.className = 'star';
+    st.style.top = Math.random() * 90 + '%';
+    st.style.left = Math.random() * 100 + '%';
+    st.style.animationDelay = (Math.random() * 3) + 's';
+    cloudLayer.appendChild(st);
+  }
+
+  /* ============ Team data ============ */
+  const TEAM = [
+    { key:'sanchita', name:'Sanchita', type:'Fire', accent:'#e0663e', accent2:'#a5341a', pokemon:'Charmander',
+      aliases:['sanchita','sharma','sanchita sharma'],
+      message:"Hey Sanchita, thank you for everything — you pulled us out of some real chaos. Here's to the sleepless nights and the effort you poured into building all of this. I'm hoping we make a great team ahead. 🥇",
+      medal:'🥇' },
+    { key:'raissa', name:'Raissa', type:'Electric', accent:'#e0a815', accent2:'#a5760a', pokemon:'Pikachu',
+      aliases:['raissa','bernabe','raissa bernabe'],
+      message:"Hey Raissa — I'm a little upset, you grabbed my mic! 😄 But honestly, that's more than okay — you built a splendid team from scratch, and it was all yours to shine. Thank you for teaching, leading, and building this with us. 🥈",
+      medal:'🥈' },
+    { key:'surya', name:'Sai Surya', type:'Dragon', accent:'#6c4fd1', accent2:'#3d2b86', pokemon:'Dragonite',
+      aliases:['sai','varakala','surya','suprince','suprincetalks','sai varakala','varakala sai'],
+      message:"Hey, that's me! 👋 SuprinceTalks is my little corner to log this journey, one sprint at a time. Thanks for stopping by — I hope you enjoyed getting to know the team.",
+      medal:'' },
+    { key:'nidhi', name:'Nidhi', type:'Water', accent:'#2d6cdf', accent2:'#173f8a', pokemon:'Squirtle',
+      aliases:['nidhi','shah','nidhi shah'],
+      message:"Hey Nidhi, thank you for showing up and helping out while the rest of us were asleep — that kind of support means everything. The team is doing great, and I'm hoping we build something wonderful together. All the best 😇 — keep learning, keep growing.",
+      medal:'' },
+    { key:'satya', name:'Satya', type:'Grass', accent:'#2f9e5b', accent2:'#1a6238', pokemon:'Bulbasaur',
+      aliases:['satya','yadav','satya yadav'],
+      message:"Hey Satya, you've been a huge help — your clarity and focus on project goals stood out, and I really loved your style of working. Keep that same stature. Keep it up, buddy.",
+      medal:'' },
+    { key:'rambabu', name:'Rambabu', type:'Ground', accent:'#a9682f', accent2:'#6e4419', pokemon:'Machop',
+      aliases:['rambabu','ram babu','babu'],
+      message:"Hey Rambabu, first off — thank you for your guidance. You've been a massive help in shaping our test strategy, and I know it'll only get better with you around. Your effort has been phenomenal — I'm expecting nothing less going forward. 🙏",
+      medal:'' },
+    { key:'siva', name:'Siva', type:'Ice', accent:'#2bb6c4', accent2:'#166e78', pokemon:'Lapras',
+      aliases:['siva','sivaram','siva ram'],
+      message:"Hey Siva, you're super cool — even when things got tight, you pulled through. Thanks a tonne for being part of this team 👏 — here's to making even bigger things happen together.",
+      medal:'' },
+    { key:'yamini', name:'Yamini', type:'Fairy', accent:'#d6558c', accent2:'#8f3260', pokemon:'Clefairy',
+      aliases:['yamini'],
+      message:"Is that you, Yamini? 👀 Thank you for everything — and if I was ever harsh on you, I'm truly sorry. I'm grateful for all you've brought to this team, and I hope we'll build something great together.",
+      medal:'' },
+    { key:'laik', name:'Laik', type:'Normal', accent:'#3aa6a0', accent2:'#1f6763', pokemon:'Eevee',
+      aliases:['laik'],
+      message:"Hi Laik, hope you're enjoying this new style of working. Trust me — you'll enjoy it more and more, and you'll keep learning as we grow together.",
+      medal:'' },
+    { key:'sunkul', name:'Sunkul Pradeep', type:'Sun', accent:'#e8a13c', accent2:'#a06a1c', pokemon:'Vulpix',
+      aliases:['sunkul','pradeep','sunkul pradeep'],
+      message:"Hey Sunkul Pradeep — I know everyone calls you by your surname instead of Pradeep, but honestly, it's a cool name. You've even got 'Sun' ☀️ hiding right in it. Great name, great energy — hope you have a fantastic time with this team. All the best, and thanks for everything.",
+      medal:'' },
+  ];
+  const FRONT_IMGS = [
+    'https://raw.githubusercontent.com/suryasticsai/suprincetalks/main/images/note1.png',
+    'https://raw.githubusercontent.com/suryasticsai/suprincetalks/main/images/note2.png'
+  ];
+
+  const grid = document.getElementById('teamGrid');
+  const teamCard = document.getElementById('teamCard');
+  const teamHeading = document.getElementById('teamHeading');
+  const teamIntro = document.getElementById('teamIntro');
+
+  // Renders ONLY the one identified person's card — nobody else's note is shown.
+  function renderCard(person){
+    grid.innerHTML = '';
+    teamCard.style.display = 'block';
+
+    if (!person) {
+      teamHeading.textContent = '🎴 No Card Yet';
+      teamIntro.innerHTML = '<p>I don\'t have a personalized note matched to that name just yet — but thanks so much for stopping by! 💙</p>';
+      return;
+    }
+
+    teamHeading.textContent = `🎴 Hey ${person.name.split(' ')[0]}, this one's for you`;
+    teamIntro.innerHTML = '<p>Tap the card to flip it.</p>';
+
+    const frontImg = FRONT_IMGS[Math.floor(Math.random() * FRONT_IMGS.length)];
+    const wrap = document.createElement('div');
+    wrap.className = 'flip-wrap';
+    wrap.innerHTML = `
+      ${person.medal ? `<div class="medal-ribbon">${person.medal}</div>` : ''}
+      <div class="poke-card" id="card-${person.key}" tabindex="0" style="--card-accent:${person.accent}; --card-accent2:${person.accent2};">
+        <div class="poke-card-inner">
+          <div class="poke-card-face poke-card-front">
+            <img class="front-img" src="${frontImg}" alt="">
+            <div class="front-overlay">
+              <img class="poke-thumb" alt="" data-pending="${person.pokemon}">
+              <span class="poke-emoji">🎴</span>
+              <div class="p-name">${person.name}</div>
+              <div class="p-type">${person.type} type</div>
+            </div>
+          </div>
+          <div class="poke-card-face poke-card-back">
+            <div class="trainer-title">A note for ${person.name.split(' ')[0]}</div>
+            <p>${person.message}</p>
+          </div>
+        </div>
+      </div>
+      <div class="flip-hint">tap to flip</div>
+    `;
+    grid.appendChild(wrap);
+
+    const cardEl = wrap.querySelector('.poke-card');
+    function flip(){ cardEl.classList.toggle('flipped'); playFlipSound(); }
+    cardEl.addEventListener('click', flip);
+    cardEl.addEventListener('keypress', e => { if (e.key === 'Enter' || e.key === ' ') flip(); });
+
+    const thumb = wrap.querySelector('.poke-thumb');
+    const emoji = wrap.querySelector('.poke-emoji');
+    const pokeSlug = person.pokemon.toLowerCase();
+    thumb.src = `https://img.pokemondb.net/artwork/large/${pokeSlug}.jpg`;
+    thumb.onload = () => { thumb.style.display = 'block'; emoji.style.display = 'none'; };
+    thumb.onerror = () => { thumb.style.display = 'none'; emoji.style.display = 'block'; };
+  }
+
+  /* ============ Name gate matching ============ */
+  const gate = document.getElementById('nameGate');
+  const input = document.getElementById('nameInput');
+  const heroEyebrow = document.getElementById('heroEyebrow');
+  const personalNote = document.getElementById('personalNote');
+
+  const ALL_ALIASES = [];
+  TEAM.forEach(p => p.aliases.forEach(a => ALL_ALIASES.push({ alias: a, key: p.key })));
+  ALL_ALIASES.sort((a, b) => b.alias.length - a.alias.length);
+
+  function matchPerson(raw){
+    const q = raw.trim().toLowerCase();
+    if (!q) return null;
+    for (const { alias, key } of ALL_ALIASES) {
+      if (q.includes(alias) || alias.includes(q)) {
+        return TEAM.find(p => p.key === key);
+      }
+    }
+    return null;
+  }
+
+  function applyPersonTheme(p){
+    if (!p) return;
+    document.documentElement.style.setProperty('--gold', p.accent);
+    document.documentElement.style.setProperty('--gold2', p.accent2);
+    document.documentElement.style.setProperty('--tcs-blue', p.accent);
+  }
+
+  function closeGate(person, typedName){
+    playChime();
+    gate.classList.add('gate-hidden');
+    setTimeout(() => gate.style.display = 'none', 550);
+    if (person) {
+      applyPersonTheme(person);
+      heroEyebrow.textContent = `🎉 Welcome back, ${person.name}!`;
+      personalNote.textContent = `Psst — your personalized note is waiting below 💌`;
+      personalNote.classList.add('show');
+      renderCard(person);
+    } else if (typedName) {
+      heroEyebrow.textContent = `🎉 Welcome, ${typedName}!`;
+      renderCard(null);
+    }
+    // if skipped with no name at all, the card section stays hidden entirely
+  }
+
+  document.getElementById('nameSubmit').addEventListener('click', () => {
+    const val = input.value;
+    closeGate(matchPerson(val), val.trim());
+  });
+  document.getElementById('nameSkip').addEventListener('click', () => closeGate(null, ''));
+  input.addEventListener('keypress', e => { if (e.key === 'Enter') document.getElementById('nameSubmit').click(); });
+</script>
+
+</body>
+</html>
